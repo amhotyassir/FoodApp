@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View,BackHandler, Keyboard, KeyboardAvoidingView, TouchableWithoutFeedback, Alert, ActivityIndicator, TouchableOpacity, Text, TextInput, ImageBackground, Platform, StatusBar, StyleSheet, Animated } from 'react-native'
+import ProfilePicture from 'react-native-profile-picture';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import { View, Image, BackHandler, Keyboard, KeyboardAvoidingView, TouchableWithoutFeedback, Alert, ActivityIndicator, TouchableOpacity, Text, TextInput, ImageBackground, Platform, StatusBar, StyleSheet, Animated } from 'react-native'
 import { Box, Input, NativeBaseProvider, WarningOutlineIcon, FormControl, Button, ScrollView } from 'native-base';
+import Modal from 'react-native-modal';
+import * as ImagePicker from 'expo-image-picker';
 import useKeyboardHeight from 'react-native-use-keyboard-height';
 export default SignUpPage = ({ setWhereToGo }) => {
     const [FirstName, setFirstName] = useState('')
@@ -13,35 +17,51 @@ export default SignUpPage = ({ setWhereToGo }) => {
     const [city, setCity] = useState('')
     const [areInfosOK, setAreInfosOK] = useState(false)
     const [padding, setPadding] = useState(0)
+    const [showPic, setShowPic] = useState(false)
+    const [picURL, setPicURL] = useState(require('./profile_pic/unknown.jpg'))
+    const [picURL2, setPicURL2] = useState(null)
     const styles = StyleSheet.create({
         all: {
             flex: 1,
         }
     })
-    
-      useEffect(() => {
+
+    useEffect(() => {
         const backAction = () => {
-          Alert.alert("Hold on!", "Are you sure you want to go back?", [
-            {
-              text: "No",
-              onPress: () => null,
-              style: "cancel"
-            },
-            { text: "YES", onPress: () => setWhereToGo('login')}
-          ]);
-          return true;
+            Alert.alert("Hold on!", "Are you sure you want to go back?", [
+                {
+                    text: "No",
+                    onPress: () => null,
+                    style: "cancel"
+                },
+                { text: "YES", onPress: () => setWhereToGo('login') }
+            ]);
+            return true;
         };
-    
+
         const backHandler = BackHandler.addEventListener(
-          "hardwareBackPress",
-          backAction
+            "hardwareBackPress",
+            backAction
         );
-    
+
         return () => backHandler.remove();
-      }, []);
+    }, []);
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        if (!result.cancelled) {
+            setPicURL2(result.uri);
+        }
+    };
     return (
 
         <View style={styles.all}>
+            <StatusBar backgroundColor={'cyan'} />
             <NativeBaseProvider>
                 <ScrollView>
 
@@ -49,7 +69,23 @@ export default SignUpPage = ({ setWhereToGo }) => {
                         Keyboard.dismiss()
                     }}>
                         <Box alignItems="center" style={{ flex: 1, paddingTop: 20, alignContent: 'center', justifyContent: 'center' }}>
+                            <TouchableOpacity onPress={() => {
+                                setShowPic(true),
+                                    Keyboard.dismiss()
+                            }}>
+                                <ProfilePicture
 
+                                    isPicture={true}
+                                    requirePicture={picURL2 === null ? picURL : null}
+                                    URLPicture={picURL2}
+                                    shape='circle'
+                                    height={100}
+                                    width={100}
+                                />
+                            </TouchableOpacity>
+                            <View style={{ padding: 20 }}>
+                                <Button size="sm" variant="subtle" _text={{ color: 'black' }} onPress={pickImage} rightIcon={<Icon name='camera' />}>Change</Button>
+                            </View>
                             <FormControl paddingTop={30} isRequired w="85%" >
                                 <FormControl.Label >
                                     First Name
@@ -131,6 +167,9 @@ export default SignUpPage = ({ setWhereToGo }) => {
                 </ScrollView>
 
             </NativeBaseProvider>
+            <Modal isVisible={showPic} onBackdropPress={() => setShowPic(false)}>
+                <Image source={picURL2?{uri:picURL2}:picURL} style={{ height: '50%', width: '90%', alignSelf: 'center' }} />
+            </Modal>
         </View>
 
     )

@@ -19,7 +19,7 @@ export default function App() {
             <Text style={{textAlign:'center'}}>lldk</Text> 
         }
       
-      <StatusBar hidden={true}/></View>
+      <StatusBar hidden={false} /></View>
   );
 }
 
