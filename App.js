@@ -1,12 +1,25 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-
+import React,{useState} from 'react'
+import { StyleSheet,Platform, StatusBar,Text, View,ActivityIndicator } from 'react-native';
+import LogInPage from './login';
+import SignUpPage from './signup'
 export default function App() {
+  const [whereToGo,setWhereToGo]=useState('login')
+
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+      {
+        whereToGo==='login'
+        ?
+        <LogInPage setWhereToGo={setWhereToGo}/>
+        :
+            whereToGo=='signup'
+            ?
+            <SignUpPage setWhereToGo={setWhereToGo}/>
+            :
+            <Text style={{textAlign:'center'}}>lldk</Text> 
+        }
+      
+      <StatusBar hidden={true}/></View>
   );
 }
 
@@ -14,7 +27,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent:'center',
+    alignContent:'center',
   },
 });
